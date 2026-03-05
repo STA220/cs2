@@ -74,6 +74,8 @@ if (!fs::file_exists("data.zip")) {
 We used `data.table::fread()` in the previous session, which is a very fast and competent reader for CSV files, but it can not read data directly from a ZIP archive. To avoid unzipping the whole file (we do not need it right now), we can use `read_csv()` instead:
 
 ```{r}
+library(tidyverse)
+library(data.table)
 patients <-
   readr::read_csv(unz("data.zip", "data-fixed/patients.csv")) |>
   setDT() |>
@@ -183,6 +185,7 @@ patients[,
 Some variables might also look like good factor candidates but might already have good enough labels. Just convert those to factors by something like:
 
 ```{r}
+#| eval: false
 patients[,
   names(.SD) := lapply(as.factor),
   .SDcols = c("____", "____", ..., "____")
@@ -320,7 +323,7 @@ csv2parquet <- function(file) {
     duckplyr::compute_parquet(new_file)
 }
 fs::dir_ls("data-fixed/") |>
-  purrr::walk(csv2parquet)
+  purrr::walk(csv2parquet, .progress = TRUE)
 fs::dir_delete("data-fixed")
 ```
 
